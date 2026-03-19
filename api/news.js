@@ -1,25 +1,16 @@
 export default async function handler(req, res) {
   const feeds = [
-    "https://www.hespress.com/economie/feed",
-    "https://www.boursenews.ma/rss",
-    "https://news.google.com/rss/search?q=bourse+casablanca&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=بورصة+الدار+البيضاء&hl=ar&gl=MA&ceid=MA:ar"
-  ];
+    // 🔥 شركات مباشرة (مهم)
+    "https://news.google.com/rss/search?q=Attijariwafa+bank&hl=fr&gl=MA&ceid=MA:fr",
+    "https://news.google.com/rss/search?q=Maroc+Telecom&hl=fr&gl=MA&ceid=MA:fr",
+    "https://news.google.com/rss/search?q=Bank+of+Africa+Morocco&hl=fr&gl=MA&ceid=MA:fr",
+    "https://news.google.com/rss/search?q=BCP+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+    "https://news.google.com/rss/search?q=CIH+Bank+Maroc&hl=fr&gl=MA&ceid=MA:fr",
 
-  // 🔥 أسماء الشركات
-  const companies = [
-    "Attijariwafa", "Attijari", "ATW",
-    "Banque Populaire", "BCP",
-    "BMCE", "Bank of Africa", "BOA",
-    "CIH", "Crédit du Maroc", "CFG Bank",
-    "Maroc Telecom", "IAM", "اتصالات المغرب",
-    "Addoha", "Alliances",
-    "Lafarge", "Ciments du Maroc",
-    "Cosumar", "Label Vie",
-    "Taqa", "Afriquia", "Total Maroc",
-    "Auto Hall", "Delta Holding",
-    "HPS", "Microdata", "Disway",
-    "CTM", "Mutandis", "Akdital"
+    // عربي
+    "https://news.google.com/rss/search?q=اتصالات+المغرب&hl=ar&gl=MA&ceid=MA:ar",
+    "https://news.google.com/rss/search?q=التجاري+وفا+بنك&hl=ar&gl=MA&ceid=MA:ar",
+    "https://news.google.com/rss/search?q=بنك+أفريقيا+المغرب&hl=ar&gl=MA&ceid=MA:ar"
   ];
 
   let articles = [];
@@ -31,26 +22,13 @@ export default async function handler(req, res) {
 
       const items = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
 
-      items.slice(0, 15).forEach(item => {
+      items.slice(0, 10).forEach(item => {
         const title = item.match(/<title>(.*?)<\/title>/)?.[1];
         const link = item.match(/<link>(.*?)<\/link>/)?.[1];
         const date = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1];
 
         if (title && link && date) {
-          const lower = title.toLowerCase();
-
-          // 🎯 الشرط: فيه اسم شركة
-          const hasCompany = companies.some(c =>
-            lower.includes(c.toLowerCase())
-          );
-
-          if (hasCompany) {
-            articles.push({
-              title,
-              link,
-              date
-            });
-          }
+          articles.push({ title, link, date });
         }
       });
 
