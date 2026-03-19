@@ -6,93 +6,71 @@ export default async function handler(req, res) {
     "https://news.google.com/rss/search?q=بورصة+الدار+البيضاء&hl=ar&gl=MA&ceid=MA:ar"
   ];
 
-  // 🔥 جميع الشركات (موسعة)
-  const companyKeywords = [
-    // بنوك
+  // 🔥 أسماء الشركات
+  const companies = [
     "Attijariwafa", "Attijari", "ATW",
     "Banque Populaire", "BCP",
     "BMCE", "Bank of Africa", "BOA",
     "CIH", "Crédit du Maroc", "CFG Bank",
-
-    // اتصالات
     "Maroc Telecom", "IAM", "اتصالات المغرب",
-
-    // عقار
-    "Addoha", "Alliances", "Résidences Dar Saada",
-
-    // صناعات
-    "LafargeHolcim", "Ciments du Maroc", "Sonasid",
-
-    // طاقة
-    "Taqa Morocco", "Afriquia Gaz", "Total Maroc",
-
-    // استهلاك
-    "Label Vie", "Cosumar", "Lesieur Cristal",
-
-    // خدمات
-    "Auto Hall", "Colorado", "Delta Holding",
+    "Addoha", "Alliances",
+    "Lafarge", "Ciments du Maroc",
+    "Cosumar", "Label Vie",
+    "Taqa", "Afriquia", "Total Maroc",
+    "Auto Hall", "Delta Holding",
     "HPS", "Microdata", "Disway",
-
-    // نقل
-    "CTM", "Air Arabia Maroc",
-
-    // أخرى
-    "Mutandis", "Akdital"
+    "CTM", "Mutandis", "Akdital"
   ];
 
   let articles = [];
 
   for (let url of feeds) {
     try {
-      const response = await fetch(url);
-      const text = await response.text();
+      const resFeed = await fetch(url);
+      const xml = await resFeed.text();
 
-      const items = text.split("<item>").slice(1, 20);
+      const items = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
 
-      items.forEach(item => {
-        const title = item.split("<title>")[1]?.split("</title>")[0];
-        const link = item.split("<link>")[1]?.split("</link>")[0];
-        const date = item.split("<pubDate>")[1]?.split("</pubDate>")[0];
+      items.slice(0, 15).forEach(item => {
+        const title = item.match(/<title>(.*?)<\/title>/)?.[1];
+        const link = item.match(/<link>(.*?)<\/link>/)?.[1];
+        const date = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1];
 
         if (title && link && date) {
-          const lowerTitle = title.toLowerCase();
+          const lower = title.toLowerCase();
 
-          // 🎯 الشرط الوحيد
-          const isCompany = companyKeywords.some(k =>
-            lowerTitle.includes(k.toLowerCase())
+          // 🎯 الشرط: فيه اسم شركة
+          const hasCompany = companies.some(c =>
+            lower.includes(c.toLowerCase())
           );
 
-          if (isCompany && title.length > 15) {
+          if (hasCompany) {
             articles.push({
               title,
               link,
-              date,
-              source: url.includes("hespress")
-                ? "Hespress"
-                : url.includes("boursenews")
-                ? "Boursenews"
-                : "Google News"
+              date
             });
           }
         }
       });
+
     } catch (e) {
-      console.error("Error fetching:", url);
+      console.log("Error:", url);
     }
   }
 
   // ⏱️ آخر 7 أيام
-  const last7Days = new Date();
-  last7Days.setDate(last7Days.getDate() - 7);
+  const last7 = new Date();
+  last7.setDate(last7.getDate() - 7);
 
-  const filtered = articles.filter(a => new Date(a.date) >= last7Days);
+  const filtered = articles.filter(a => new Date(a.date) >= last7);
 
   // 🧹 حذف التكرار
   const unique = Array.from(
-    new Map(filtered.map(item => [item.title, item])).values()
+    new Map(filtered.map(a => [a.title, a])).values()
   );
 
-  // 📊 ترتيب حسب التاريخ
+  // ترتيب
   unique.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   res.status(200).json(unique.slice(0, 30));
