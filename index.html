@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Morocco Stock News</title>
+</head>
+<body>
+  <h1>Latest Morocco Stock News</h1>
+  <ul id="news"></ul>
+
+  <script>
+    fetch("/api/news")
+      .then(res => res.json())
+      .then(data => {
+        const ul = document.getElementById("news");
+        data.forEach(n => {
+          const li = document.createElement("li");
+          li.innerHTML = `<a href="${n.link}" target="_blank">${n.title}</a>`;
+          ul.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
