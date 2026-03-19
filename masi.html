@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MASI Today - Bourse Casablanca News</title>
+
+  <!-- 🔥 SEO -->
+  <meta name="description" content="Latest MASI index news and Moroccan stock market updates today. Real-time news for investors.">
+  <meta name="keywords" content="MASI today, Bourse Casablanca, Moroccan stocks, Maroc bourse news">
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #020617;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #38bdf8;
+    }
+
+    .news {
+      max-width: 700px;
+      margin: auto;
+      text-align: left;
+    }
+
+    a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>📊 MASI Today</h1>
+<p>Latest Moroccan Stock Market News</p>
+
+<div class="news" id="news"></div>
+
+<script>
+fetch("/api/news")
+  .then(res => res.json())
+  .then(data => {
+
+    const container = document.getElementById("news");
+
+    data.news.slice(0, 10).forEach(n => {
+      const div = document.createElement("div");
+
+      div.innerHTML = `
+        <p>
+          <a href="${n.link}" target="_blank">${n.title}</a>
+        </p>
+      `;
+
+      container.appendChild(div);
+    });
+
+  });
+</script>
+
+</body>
+</html>
