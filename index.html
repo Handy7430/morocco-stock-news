@@ -6,63 +6,39 @@
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial;
       color: white;
-
-      background: 
-        linear-gradient(rgba(2,6,23,0.9), rgba(2,6,23,0.95)),
-        url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3');
-
+      background: linear-gradient(rgba(2,6,23,0.9), rgba(2,6,23,0.95)),
+      url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3');
       background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
     }
 
     header {
       text-align: center;
-      padding: 30px;
-      background: rgba(15,23,42,0.6);
-      backdrop-filter: blur(10px);
-    }
-
-    header img {
-      width: 100px;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      color: #38bdf8;
-      margin: 0;
+      padding: 25px;
     }
 
     .trend {
       text-align: center;
-      font-size: 22px;
-      margin: 20px;
-      font-weight: bold;
+      font-size: 20px;
+      margin: 15px;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 800px;
       margin: auto;
       padding: 20px;
     }
 
     .card {
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(15,23,42,0.7);
       padding: 20px;
-      margin-bottom: 15px;
-      border-radius: 12px;
-      transition: 0.3s;
-    }
-
-    .card:hover {
-      transform: scale(1.02);
+      margin-bottom: 10px;
+      border-radius: 10px;
     }
 
     a {
-      color: #e2e8f0;
-      font-size: 18px;
+      color: #38bdf8;
       text-decoration: none;
       font-weight: bold;
     }
@@ -70,34 +46,24 @@
     .meta {
       font-size: 12px;
       color: #94a3b8;
-      margin-top: 5px;
-    }
-
-    .sentiment {
-      margin-top: 8px;
-      font-size: 12px;
     }
 
     .positive { color: #22c55e; }
     .negative { color: red; }
-    .neutral { color: #fbbf24; }
+    .neutral { color: orange; }
   </style>
 </head>
 
 <body>
 
 <header>
-  <img src="logo.png" />
-  <h1>Atlas Markets</h1>
-  <p>Live Moroccan Stock Market News</p>
+  <h1>📈 Atlas Markets</h1>
 </header>
 
 <div class="trend" id="trend"></div>
-
 <div class="container" id="news"></div>
 
 <script>
-function loadNews() <script>
 function loadNews() {
   fetch("/api/news")
     .then(res => res.json())
@@ -111,10 +77,8 @@ function loadNews() {
         return;
       }
 
-      // عرض trend
       trendDiv.innerHTML = "Market Trend: " + data.trend;
 
-      // مسح القديم
       container.innerHTML = "";
 
       data.news.forEach(n => {
@@ -128,8 +92,8 @@ function loadNews() {
         div.innerHTML = `
           <a href="${n.link}" target="_blank">${n.title}</a>
           <div class="meta">${new Date(n.date).toLocaleString()}</div>
-          <div class="sentiment ${sentimentClass}">
-            ${n.sentiment || "Neutral"}
+          <div class="${sentimentClass}">
+            ${n.sentiment}
           </div>
         `;
 
@@ -138,9 +102,8 @@ function loadNews() {
 
     })
     .catch(err => {
-      console.log("Error:", err);
-      document.getElementById("news").innerHTML =
-        "<p>Error loading news</p>";
+      console.log(err);
+      document.getElementById("news").innerHTML = "Error loading news";
     });
 }
 
@@ -149,67 +112,6 @@ loadNews();
 
 // تحديث كل دقيقة
 setInterval(loadNews, 60000);
-</script>
-
-      document.getElementById("trend").innerHTML =
-        "Market Trend: " + data.trend;
-
-      const container = document.getElementById("news");
-      container.innerHTML = ""; // مهم باش ما يتكرروش
-
-      data.news.forEach(n => {
-        const div = document.createElement("div");
-        div.className = "card";
-
-        let sentimentClass = "neutral";
-        if (n.sentiment === "Positive") sentimentClass = "positive";
-        if (n.sentiment === "Negative") sentimentClass = "negative";
-
-        div.innerHTML = `
-          <a href="${n.link}" target="_blank">${n.title}</a>
-          <div class="meta">${new Date(n.date).toLocaleString()}</div>
-          <div class="sentiment ${sentimentClass}">
-            ${n.sentiment}
-          </div>
-        `;
-
-        container.appendChild(div);
-      });
-
-    });
-}
-
-// 🔥 أول تحميل
-loadNews();
-
-// 🔁 تحديث كل 30 ثانية
-setInterval(loadNews, 30000);
-
-    document.getElementById("trend").innerHTML =
-      "Market Trend: " + data.trend;
-
-    const container = document.getElementById("news");
-
-    data.news.forEach(n => {
-      const div = document.createElement("div");
-      div.className = "card";
-
-      let sentimentClass = "neutral";
-      if (n.sentiment === "Positive") sentimentClass = "positive";
-      if (n.sentiment === "Negative") sentimentClass = "negative";
-
-      div.innerHTML = `
-        <a href="${n.link}" target="_blank">${n.title}</a>
-        <div class="meta">${new Date(n.date).toLocaleString()}</div>
-        <div class="sentiment ${sentimentClass}">
-          ${n.sentiment}
-        </div>
-      `;
-
-      container.appendChild(div);
-    });
-
-  });
 </script>
 
 </body>
