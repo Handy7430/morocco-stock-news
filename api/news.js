@@ -6,18 +6,22 @@ export default async function handler(req, res) {
     "https://news.google.com/rss/search?q=بورصة+الدار+البيضاء&hl=ar&gl=MA&ceid=MA:ar"
   ];
 
-  // 🔥 KEYWORDS قوية (شركات + سوق)
-  const keywords = [
-    // FR عام
+  // 🔥 كلمات السوق (عام)
+  const stockKeywords = [
     "bourse", "casablanca", "MASI", "marché", "actions",
     "IPO", "résultats", "dividende", "bénéfices",
+    "marché financier",
+    "بورصة", "الدار البيضاء", "أسهم", "نتائج", "أرباح", "توزيعات"
+  ];
 
-    // AR عام
-    "بورصة", "الدار البيضاء", "أسهم", "نتائج", "أرباح", "توزيعات",
-
+  // 🔥 جميع الشركات المهمة فالبورصة
+  const companyKeywords = [
     // بنوك
-    "Attijariwafa", "Attijari", "BCP", "Banque Populaire",
-    "BMCE", "Bank of Africa", "CIH", "Crédit du Maroc",
+    "Attijariwafa", "Attijari", "ATW",
+    "BCP", "Banque Populaire",
+    "BMCE", "Bank of Africa", "BOA",
+    "CIH", "Crédit du Maroc",
+    "CFG Bank",
 
     // اتصالات
     "Maroc Telecom", "IAM", "اتصالات المغرب",
@@ -25,17 +29,24 @@ export default async function handler(req, res) {
     // عقار
     "Addoha", "Alliances", "Résidences Dar Saada",
 
-    // صناعات
-    "LafargeHolcim", "Ciments du Maroc", "Colorado", "Delta Holding",
+    // صناعات و مواد
+    "LafargeHolcim", "Ciments du Maroc", "Sonasid",
 
     // طاقة
-    "Total Maroc", "Afriquia Gaz", "Taqa Morocco",
+    "Taqa Morocco", "Afriquia Gaz", "Total Maroc",
 
     // استهلاك
     "Label Vie", "Cosumar", "Lesieur Cristal",
 
-    // نقل
-    "CTM"
+    // خدمات و أخرى
+    "Auto Hall", "Colorado", "Delta Holding",
+    "HPS", "Microdata", "Disway",
+
+    // نقل و سياحة
+    "CTM", "Air Arabia Maroc",
+
+    // إضافات
+    "Mutandis", "Saham", "Akdital"
   ];
 
   let articles = [];
@@ -55,10 +66,16 @@ export default async function handler(req, res) {
         if (title && link && date) {
           const lowerTitle = title.toLowerCase();
 
-          // 🎯 فلترة بالكلمات المفتاحية
-          const isRelevant = keywords.some(k =>
+          const isStock = stockKeywords.some(k =>
             lowerTitle.includes(k.toLowerCase())
           );
+
+          const isCompany = companyKeywords.some(k =>
+            lowerTitle.includes(k.toLowerCase())
+          );
+
+          // 🎯 فلترة ذكية
+          const isRelevant = isStock || isCompany;
 
           if (isRelevant && title.length > 20) {
             articles.push({
@@ -75,24 +92,23 @@ export default async function handler(req, res) {
         }
       });
     } catch (e) {
-      console.error("Error fetching:", url);
+      console.error("Error:", url);
     }
   }
 
-  // ⏱️ آخر 7 أيام فقط
+  // ⏱️ آخر 7 أيام
   const last7Days = new Date();
   last7Days.setDate(last7Days.getDate() - 7);
 
   const filtered = articles.filter(a => new Date(a.date) >= last7Days);
 
-  // 🧹 حذف التكرار (حسب title)
+  // 🧹 حذف التكرار
   const unique = Array.from(
     new Map(filtered.map(item => [item.title, item])).values()
   );
 
-  // 📊 ترتيب حسب الأحدث
+  // 📊 ترتيب
   unique.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // 🔚 limit
   res.status(200).json(unique.slice(0, 30));
 }
