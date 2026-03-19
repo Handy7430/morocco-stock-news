@@ -1,17 +1,56 @@
 export default async function handler(req, res) {
   const feeds = [
-    // 🔥 شركات مباشرة (مهم)
-    "https://news.google.com/rss/search?q=Attijariwafa+bank&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=Maroc+Telecom&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=Bank+of+Africa+Morocco&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=BCP+Maroc&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=CIH+Bank+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  // 🏦 بنوك
+  "https://news.google.com/rss/search?q=Attijariwafa+bank&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Banque+Populaire+Maroc+BCP&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Bank+of+Africa+Morocco+BMCE&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=CIH+Bank+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Crédit+du+Maroc&hl=fr&gl=MA&ceid=MA:fr",
 
-    // عربي
-    "https://news.google.com/rss/search?q=اتصالات+المغرب&hl=ar&gl=MA&ceid=MA:ar",
-    "https://news.google.com/rss/search?q=التجاري+وفا+بنك&hl=ar&gl=MA&ceid=MA:ar",
-    "https://news.google.com/rss/search?q=بنك+أفريقيا+المغرب&hl=ar&gl=MA&ceid=MA:ar"
-  ];
+  // 📡 اتصالات
+  "https://news.google.com/rss/search?q=Maroc+Telecom+IAM&hl=fr&gl=MA&ceid=MA:fr",
+
+  // 🏗️ عقار
+  "https://news.google.com/rss/search?q=Addoha+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Alliances+Développement+Immobilier&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Résidences+Dar+Saada+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+
+  // 🏭 صناعات
+  "https://news.google.com/rss/search?q=LafargeHolcim+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Ciments+du+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Sonasid+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+
+  // ⚡ طاقة
+  "https://news.google.com/rss/search?q=Taqa+Morocco&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Afriquia+Gaz&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Total+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+
+  // 🛒 استهلاك
+  "https://news.google.com/rss/search?q=Label+Vie+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Cosumar+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Lesieur+Cristal&hl=fr&gl=MA&ceid=MA:fr",
+
+  // 💻 تكنولوجيا
+  "https://news.google.com/rss/search?q=HPS+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Microdata+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Disway+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+
+  // 🚗 صناعات وخدمات
+  "https://news.google.com/rss/search?q=Auto+Hall+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Colorado+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+  "https://news.google.com/rss/search?q=Delta+Holding+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+
+  // ✈️ نقل
+  "https://news.google.com/rss/search?q=CTM+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+
+  // 🏥 صحة
+  "https://news.google.com/rss/search?q=Akdital+Maroc&hl=fr&gl=MA&ceid=MA:fr",
+
+  // 🌍 عربي (باش تزيد coverage)
+  "https://news.google.com/rss/search?q=اتصالات+المغرب&hl=ar&gl=MA&ceid=MA:ar",
+  "https://news.google.com/rss/search?q=التجاري+وفا+بنك&hl=ar&gl=MA&ceid=MA:ar",
+  "https://news.google.com/rss/search?q=بنك+أفريقيا+المغرب&hl=ar&gl=MA&ceid=MA:ar"
+];
 
   let articles = [];
 
