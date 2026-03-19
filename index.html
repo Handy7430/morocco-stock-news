@@ -97,10 +97,59 @@
 <div class="container" id="news"></div>
 
 <script>
+function loadNews() <script>
 function loadNews() {
   fetch("/api/news")
     .then(res => res.json())
     .then(data => {
+
+      const container = document.getElementById("news");
+      const trendDiv = document.getElementById("trend");
+
+      if (!data || !data.news) {
+        container.innerHTML = "<p>No news available</p>";
+        return;
+      }
+
+      // عرض trend
+      trendDiv.innerHTML = "Market Trend: " + data.trend;
+
+      // مسح القديم
+      container.innerHTML = "";
+
+      data.news.forEach(n => {
+        const div = document.createElement("div");
+        div.className = "card";
+
+        let sentimentClass = "neutral";
+        if (n.sentiment === "Positive") sentimentClass = "positive";
+        if (n.sentiment === "Negative") sentimentClass = "negative";
+
+        div.innerHTML = `
+          <a href="${n.link}" target="_blank">${n.title}</a>
+          <div class="meta">${new Date(n.date).toLocaleString()}</div>
+          <div class="sentiment ${sentimentClass}">
+            ${n.sentiment || "Neutral"}
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+
+    })
+    .catch(err => {
+      console.log("Error:", err);
+      document.getElementById("news").innerHTML =
+        "<p>Error loading news</p>";
+    });
+}
+
+// أول تحميل
+loadNews();
+
+// تحديث كل دقيقة
+setInterval(loadNews, 60000);
+</script>
 
       document.getElementById("trend").innerHTML =
         "Market Trend: " + data.trend;
