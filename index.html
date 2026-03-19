@@ -2,22 +2,104 @@
 <html>
 <head>
   <title>Morocco Stock News</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 10px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+      background: #334155;
+    }
+
+    a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .meta {
+      font-size: 12px;
+      margin-top: 5px;
+      color: #94a3b8;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .high {
+      background: red;
+    }
+
+    .medium {
+      background: orange;
+    }
+
+    .low {
+      background: green;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>Latest Morocco Stock News</h1>
-  <ul id="news"></ul>
+
+  <h1>📈 Morocco Stock Market News</h1>
+
+  <div class="container" id="news"></div>
 
   <script>
     fetch("/api/news")
       .then(res => res.json())
       .then(data => {
-        const ul = document.getElementById("news");
+        const container = document.getElementById("news");
+
         data.forEach(n => {
-          const li = document.createElement("li");
-          li.innerHTML = `<a href="${n.link}" target="_blank">${n.title}</a>`;
-          ul.appendChild(li);
+          const div = document.createElement("div");
+          div.className = "card";
+
+          let badgeClass = "low";
+          if (n.impact === "High") badgeClass = "high";
+          if (n.impact === "Medium") badgeClass = "medium";
+
+          div.innerHTML = `
+            <a href="${n.link}" target="_blank">${n.title}</a>
+            <div class="meta">${new Date(n.date).toLocaleString()}</div>
+            <span class="badge ${badgeClass}">${n.impact}</span>
+          `;
+
+          container.appendChild(div);
         });
       });
   </script>
+
 </body>
 </html>
