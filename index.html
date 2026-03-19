@@ -1,80 +1,111 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Morocco Stock News</title>
+  <title>Bourse Casablanca News</title>
 
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
+      font-family: 'Segoe UI', sans-serif;
+      background: #020617;
       color: white;
     }
 
-    h1 {
-      text-align: center;
+    header {
+      background: #020617;
       padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      color: #38bdf8;
     }
 
     .container {
       max-width: 900px;
       margin: auto;
-      padding: 10px;
+      padding: 20px;
     }
 
     .card {
-      background: #1e293b;
-      padding: 15px;
+      background: linear-gradient(145deg, #0f172a, #1e293b);
+      padding: 18px;
       margin-bottom: 15px;
-      border-radius: 10px;
-      transition: 0.3s;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
     }
 
     .card:hover {
-      transform: scale(1.02);
-      background: #334155;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     }
 
     a {
-      color: #38bdf8;
+      color: #e2e8f0;
       text-decoration: none;
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 600;
+      display: block;
+    }
+
+    a:hover {
+      color: #38bdf8;
     }
 
     .meta {
       font-size: 12px;
-      margin-top: 5px;
+      margin-top: 8px;
       color: #94a3b8;
     }
 
     .badge {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 5px;
+      padding: 5px 10px;
+      border-radius: 999px;
       font-size: 12px;
-      margin-top: 8px;
+      margin-top: 10px;
+      font-weight: bold;
     }
 
     .high {
-      background: red;
+      background: rgba(255, 0, 0, 0.2);
+      color: red;
     }
 
     .medium {
-      background: orange;
+      background: rgba(255, 165, 0, 0.2);
+      color: orange;
     }
 
     .low {
-      background: green;
+      background: rgba(0, 255, 0, 0.2);
+      color: #22c55e;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #64748b;
+      font-size: 12px;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>📈 Morocco Stock Market News</h1>
+  <header>
+    <h1>📊 Bourse Casablanca News</h1>
+  </header>
 
   <div class="container" id="news"></div>
+
+  <div class="footer">
+    Powered by Morocco Stock AI 🚀
+  </div>
 
   <script>
     fetch("/api/news")
