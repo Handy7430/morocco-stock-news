@@ -10,7 +10,7 @@
       color: white;
 
       background: 
-        linear-gradient(rgba(2,6,23,0.85), rgba(2,6,23,0.95)),
+        linear-gradient(rgba(2,6,23,0.9), rgba(2,6,23,0.95)),
         url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3');
 
       background-size: cover;
@@ -21,28 +21,25 @@
     header {
       text-align: center;
       padding: 30px;
-      backdrop-filter: blur(12px);
       background: rgba(15,23,42,0.6);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
     }
 
     header img {
       width: 100px;
-      margin-bottom: 15px;
-      border-radius: 10px;
+      margin-bottom: 10px;
     }
 
-    header h1 {
-      margin: 0;
+    h1 {
       color: #38bdf8;
-      font-size: 28px;
-      letter-spacing: 1px;
+      margin: 0;
     }
 
-    header p {
-      margin-top: 5px;
-      color: #94a3b8;
-      font-size: 14px;
+    .trend {
+      text-align: center;
+      font-size: 22px;
+      margin: 20px;
+      font-weight: bold;
     }
 
     .container {
@@ -53,112 +50,83 @@
 
     .card {
       background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(10px);
-      padding: 22px;
-      margin-bottom: 18px;
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 12px;
       transition: 0.3s;
     }
 
     .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+      transform: scale(1.02);
     }
 
     a {
       color: #e2e8f0;
+      font-size: 18px;
       text-decoration: none;
-      font-size: 20px;
-      font-weight: 600;
-      display: block;
-    }
-
-    a:hover {
-      color: #38bdf8;
-    }
-
-    .meta {
-      font-size: 13px;
-      margin-top: 10px;
-      color: #94a3b8;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      margin-top: 10px;
       font-weight: bold;
     }
 
-    .high {
-      background: rgba(255, 0, 0, 0.2);
-      color: #ff4d4d;
+    .meta {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 5px;
     }
 
-    .medium {
-      background: rgba(255, 165, 0, 0.2);
-      color: #fbbf24;
-    }
-
-    .low {
-      background: rgba(0, 255, 0, 0.2);
-      color: #22c55e;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 20px;
-      color: #64748b;
+    .sentiment {
+      margin-top: 8px;
       font-size: 12px;
     }
+
+    .positive { color: #22c55e; }
+    .negative { color: red; }
+    .neutral { color: #fbbf24; }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <img src="logo.png" />
-    <h1>📈 Atlas Markets</h1>
-    <p>Live Moroccan Stock Market News</p>
-  </header>
+<header>
+  <img src="logo.png" />
+  <h1>Atlas Markets</h1>
+  <p>Live Moroccan Stock Market News</p>
+</header>
 
-  <div class="container" id="news"></div>
+<div class="trend" id="trend"></div>
 
-  <div class="footer">
-    Powered by Atlas Markets 🚀
-  </div>
+<div class="container" id="news"></div>
 
-  <script>
-    fetch("/api/news")
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById("news");
+<script>
+fetch("/api/news")
+  .then(res => res.json())
+  .then(data => {
 
-        data.forEach(n => {
-          const div = document.createElement("div");
-          div.className = "card";
+    document.getElementById("trend").innerHTML =
+      "Market Trend: " + data.trend;
 
-          let impact = n.impact || "Low";
-          let badgeClass = "low";
+    const container = document.getElementById("news");
 
-          if (impact === "High") badgeClass = "high";
-          if (impact === "Medium") badgeClass = "medium";
+    data.news.forEach(n => {
+      const div = document.createElement("div");
+      div.className = "card";
 
-          div.innerHTML = `
-            <a href="${n.link}" target="_blank">${n.title}</a>
-            <div class="meta">
-              ${new Date(n.date).toLocaleString()} • ${n.source || "News"}
-            </div>
-            <span class="badge ${badgeClass}">${impact}</span>
-          `;
+      let sentimentClass = "neutral";
+      if (n.sentiment === "Positive") sentimentClass = "positive";
+      if (n.sentiment === "Negative") sentimentClass = "negative";
 
-          container.appendChild(div);
-        });
-      });
-  </script>
+      div.innerHTML = `
+        <a href="${n.link}" target="_blank">${n.title}</a>
+        <div class="meta">${new Date(n.date).toLocaleString()}</div>
+        <div class="sentiment ${sentimentClass}">
+          ${n.sentiment}
+        </div>
+      `;
+
+      container.appendChild(div);
+    });
+
+  });
+</script>
 
 </body>
 </html>
