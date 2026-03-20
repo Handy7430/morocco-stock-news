@@ -1,32 +1,17 @@
+export const dynamic = "force-dynamic"; // 🔥 مهم بزاف
+
 export default async function handler(req, res) {
   const feeds = [
     "https://www.hespress.com/economie/feed",
     "https://www.boursenews.ma/rss",
-    "https://medias24.com/feed" ,
-    "https://news.google.com/rss/search?q=Attijariwafa+bank&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=Maroc+Telecom&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=Bank+of+Africa+Morocco&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=BCP+Maroc&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=CIH+Bank+Maroc&hl=fr&gl=MA&ceid=MA:fr",
-    "https://news.google.com/rss/search?q=اتصالات+المغرب&hl=ar&gl=MA&ceid=MA:ar"
-  ];
-
-  const positiveWords = [
-    "hausse", "croissance", "profit", "bénéfices", "record",
-    "ارتفاع", "نمو", "أرباح"
-  ];
-
-  const negativeWords = [
-    "baisse", "perte", "crise", "chute",
-    "انخفاض", "خسارة", "تراجع"
+    "https://medias24.com/feed"
   ];
 
   let articles = [];
 
   for (let url of feeds) {
     try {
-      // 🔥 FIX cache
-      const resFeed = await fetch(url + "&t=" + Date.now(), {
+      const resFeed = await fetch(url, {
         cache: "no-store"
       });
 
@@ -34,28 +19,16 @@ export default async function handler(req, res) {
 
       const items = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
 
-      items.slice(0, 15).forEach(item => {
+      items.slice(0, 20).forEach(item => {
         const title = item.match(/<title>(.*?)<\/title>/)?.[1];
         const link = item.match(/<link>(.*?)<\/link>/)?.[1];
         const date = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1];
 
         if (title && link && date) {
-          const lower = title.toLowerCase();
-
-          let sentiment = "Neutral";
-
-          if (positiveWords.some(w => lower.includes(w))) {
-            sentiment = "Positive";
-          } else if (negativeWords.some(w => lower.includes(w))) {
-            sentiment = "Negative";
-          }
-
           articles.push({
             title,
             link,
-            date,
-            sentiment,
-            source: "Google News"
+            date
           });
         }
       });
@@ -65,34 +38,12 @@ export default async function handler(req, res) {
     }
   }
 
-  // 🔥 آخر 7 أيام
-  const last7 = new Date();
-  last7.setDate(last7.getDate() - 7);
+  // 🔥 ترتيب
+  articles.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const filtered = articles.filter(a => new Date(a.date) >= last7);
-
-  // 🔥 remove duplicates
-  const unique = Array.from(
-    new Map(filtered.map(a => [a.title, a])).values()
-  );
-
-  // 🔥 sort
-  unique.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-  // 🔥 MARKET PREDICTION
-  const positiveCount = unique.filter(a => a.sentiment === "Positive").length;
-  const negativeCount = unique.filter(a => a.sentiment === "Negative").length;
-
-  let trend = "Stable ⚖️";
-
-  if (positiveCount > negativeCount) {
-    trend = "Bullish 📈";
-  } else if (negativeCount > positiveCount) {
-    trend = "Bearish 📉";
-  }
-
+  res.setHeader("Cache-Control", "no-store"); // 🔥 مهم
   res.status(200).json({
-    trend,
-    news: unique.slice(0, 30)
+    trend: "Live 🔥",
+    news: articles.slice(0, 30)
   });
 }
