@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic"; // 🔥 مهم بزاف
+export const dynamic = "force-dynamic";
 
 export default async function handler(req, res) {
   const feeds = [
@@ -11,37 +11,47 @@ export default async function handler(req, res) {
 
   for (let url of feeds) {
     try {
-      const resFeed = await fetch(url, {
-        cache: "no-store"
-      });
+      const response = await fetch(url, { cache: "no-store" });
+      const text = await response.text();
 
-      const xml = await resFeed.text();
+      // 🔥 طريقة بسيطة (ما كتطيحش)
+      const parts = text.split("<item>").slice(1, 15);
 
-      const items = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
+      parts.forEach(item => {
+        const title = item.split("<title>")[1]?.split("</title>")[0];
+        const link = item.split("<link>")[1]?.split("</link>")[0];
+        const date = item.split("<pubDate>")[1]?.split("</pubDate>")[0];
 
-      items.slice(0, 20).forEach(item => {
-        const title = item.match(/<title>(.*?)<\/title>/)?.[1];
-        const link = item.match(/<link>(.*?)<\/link>/)?.[1];
-        const date = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1];
-
-        if (title && link && date) {
+        if (title && link) {
           articles.push({
             title,
             link,
-            date
+            date: date || new Date().toISOString()
           });
         }
       });
 
-    } catch (e) {
-      console.log("Error:", url);
+    } catch (err) {
+      console.log("Error fetching:", url);
     }
   }
 
-  // 🔥 ترتيب
+  // 🔥 إلا كانو 0 → رجع fallback
+  if (articles.length === 0) {
+    articles = [
+      {
+        title: "No news detected - check sources",
+        link: "#",
+        date: new Date().toISOString()
+      }
+    ];
+  }
+
+  // ترتيب
   articles.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  res.setHeader("Cache-Control", "no-store"); // 🔥 مهم
+  res.setHeader("Cache-Control", "no-store");
+
   res.status(200).json({
     trend: "Live 🔥",
     news: articles.slice(0, 30)
