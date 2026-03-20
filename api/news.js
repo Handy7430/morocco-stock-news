@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   const feeds = [
     "https://www.hespress.com/economie/feed",
     "https://www.boursenews.ma/rss",
-    "https://medias24.com/feed"
+    "https://medias24.com/feed" ,
     "https://news.google.com/rss/search?q=Attijariwafa+bank&hl=fr&gl=MA&ceid=MA:fr",
     "https://news.google.com/rss/search?q=Maroc+Telecom&hl=fr&gl=MA&ceid=MA:fr",
     "https://news.google.com/rss/search?q=Bank+of+Africa+Morocco&hl=fr&gl=MA&ceid=MA:fr",
