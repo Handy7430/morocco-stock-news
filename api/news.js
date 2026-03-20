@@ -5,15 +5,12 @@ export default async function handler(req, res) {
     "https://news.google.com/rss/search?q=Bank+of+Africa+Morocco&hl=fr&gl=MA&ceid=MA:fr",
     "https://news.google.com/rss/search?q=BCP+Maroc&hl=fr&gl=MA&ceid=MA:fr",
     "https://news.google.com/rss/search?q=CIH+Bank+Maroc&hl=fr&gl=MA&ceid=MA:fr",
-
-    "https://news.google.com/rss/search?q=اتصالات+المغرب&hl=ar&gl=MA&ceid=MA:ar",
-    "https://news.google.com/rss/search?q=التجاري+وفا+بنك&hl=ar&gl=MA&ceid=MA:ar",
-    "https://news.google.com/rss/search?q=بنك+أفريقيا+المغرب&hl=ar&gl=MA&ceid=MA:ar"
+    "https://news.google.com/rss/search?q=اتصالات+المغرب&hl=ar&gl=MA&ceid=MA:ar"
   ];
 
   const positiveWords = [
     "hausse", "croissance", "profit", "bénéfices", "record",
-    "ارتفاع", "نمو", "أرباح", "تحسن"
+    "ارتفاع", "نمو", "أرباح"
   ];
 
   const negativeWords = [
@@ -25,7 +22,11 @@ export default async function handler(req, res) {
 
   for (let url of feeds) {
     try {
-      const resFeed = await fetch(url);
+      // 🔥 FIX cache
+      const resFeed = await fetch(url + "&t=" + Date.now(), {
+        cache: "no-store"
+      });
+
       const xml = await resFeed.text();
 
       const items = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
@@ -50,7 +51,8 @@ export default async function handler(req, res) {
             title,
             link,
             date,
-            sentiment
+            sentiment,
+            source: "Google News"
           });
         }
       });
@@ -60,31 +62,34 @@ export default async function handler(req, res) {
     }
   }
 
+  // 🔥 آخر 7 أيام
   const last7 = new Date();
   last7.setDate(last7.getDate() - 7);
 
   const filtered = articles.filter(a => new Date(a.date) >= last7);
 
+  // 🔥 remove duplicates
   const unique = Array.from(
     new Map(filtered.map(a => [a.title, a])).values()
   );
 
+  // 🔥 sort
   unique.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   // 🔥 MARKET PREDICTION
   const positiveCount = unique.filter(a => a.sentiment === "Positive").length;
   const negativeCount = unique.filter(a => a.sentiment === "Negative").length;
 
-  let marketTrend = "Stable ⚖️";
+  let trend = "Stable ⚖️";
 
   if (positiveCount > negativeCount) {
-    marketTrend = "Bullish 📈";
+    trend = "Bullish 📈";
   } else if (negativeCount > positiveCount) {
-    marketTrend = "Bearish 📉";
+    trend = "Bearish 📉";
   }
 
   res.status(200).json({
-    trend: marketTrend,
+    trend,
     news: unique.slice(0, 30)
   });
 }
