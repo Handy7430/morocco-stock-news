@@ -122,7 +122,7 @@
 
 <script>
 function loadNews() {
-  fetch("/api/news")
+  fetch("/api/news?t=" + Date.now())
     .then(res => res.json())
     .then(data => {
 
