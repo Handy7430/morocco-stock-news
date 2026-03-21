@@ -11,31 +11,41 @@ export async function GET() {
 
     for (let url of feeds) {
       const res = await fetch(url, { cache: "no-store" });
-      const text = await res.text();
+      const xml = await res.text();
 
-      const items = text.split("<item>").slice(1, 10);
+      // 🔥 parsing قوي
+      const matches = xml.match(/<item[\s\S]*?<\/item>/g) || [];
 
-      items.forEach(item => {
-        const title = item.split("<title>")[1]?.split("</title>")[0];
-        const link = item.split("<link>")[1]?.split("</link>")[0];
+      matches.slice(0, 10).forEach(item => {
+        const titleMatch = item.match(/<title>(.*?)<\/title>/);
+        const linkMatch = item.match(/<link>(.*?)<\/link>/);
+
+        const title = titleMatch?.[1];
+        const link = linkMatch?.[1];
 
         if (title && link) {
           articles.push({
-            title,
-            link,
-            date: new Date().toISOString()
+            title: title.replace(/<!\[CDATA\[|\]\]>/g, ""),
+            link
           });
         }
       });
     }
 
-    // fallback إذا خاوي
+    // 🔥 إذا ماجاب حتى حاجة
     if (articles.length === 0) {
-      articles.push({
-        title: "API works but no news found",
-        link: "#",
-        date: new Date().toISOString()
-      });
+      return new Response(
+        JSON.stringify({
+          trend: "Live 🔥",
+          news: [
+            {
+              title: "RSS connected but no items parsed",
+              link: "#"
+            }
+          ]
+        }),
+        { headers: { "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(
@@ -51,11 +61,11 @@ export async function GET() {
       }
     );
 
-  } catch (error) {
+  } catch (err) {
     return new Response(
       JSON.stringify({
-        error: "API failed",
-        details: error.toString()
+        error: "API crashed",
+        details: err.toString()
       }),
       { status: 500 }
     );
