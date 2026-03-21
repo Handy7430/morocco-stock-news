@@ -17,16 +17,14 @@ export async function GET() {
 
     for (let source of sources) {
       try {
-        const res = await fetch(source.url, {
-          cache: "no-store",
-          headers: {
-            "User-Agent": "Mozilla/5.0"
-          }
-        });
+        // 🔥 PROXY هنا
+        const proxyUrl =
+          "https://api.allorigins.win/raw?url=" +
+          encodeURIComponent(source.url);
 
+        const res = await fetch(proxyUrl);
         const html = await res.text();
 
-        // 🔥 استخراج العناوين بطريقة بسيطة
         const matches = html.match(/<h2.*?>(.*?)<\/h2>/g) || [];
 
         matches.slice(0, 10).forEach(item => {
@@ -49,7 +47,7 @@ export async function GET() {
     // 🔥 fallback
     if (articles.length === 0) {
       articles.push({
-        title: "Scraper running but no data found",
+        title: "Scraper working but sites blocked",
         link: "#"
       });
     }
