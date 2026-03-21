@@ -2,56 +2,62 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const feeds = [
-      "https://www.hespress.com/economie/feed",
-      "https://www.boursenews.ma/rss"
+    const sources = [
+      {
+        url: "https://www.hespress.com/economie",
+        name: "Hespress"
+      },
+      {
+        url: "https://www.boursenews.ma/",
+        name: "Boursenews"
+      }
     ];
 
     let articles: any[] = [];
 
-    for (let url of feeds) {
-      const res = await fetch(url, { cache: "no-store" });
-      const xml = await res.text();
+    for (let source of sources) {
+      try {
+        const res = await fetch(source.url, {
+          cache: "no-store",
+          headers: {
+            "User-Agent": "Mozilla/5.0"
+          }
+        });
 
-      // 🔥 parsing قوي
-      const matches = xml.match(/<item[\s\S]*?<\/item>/g) || [];
+        const html = await res.text();
 
-      matches.slice(0, 10).forEach(item => {
-        const titleMatch = item.match(/<title>(.*?)<\/title>/);
-        const linkMatch = item.match(/<link>(.*?)<\/link>/);
+        // 🔥 استخراج العناوين بطريقة بسيطة
+        const matches = html.match(/<h2.*?>(.*?)<\/h2>/g) || [];
 
-        const title = titleMatch?.[1];
-        const link = linkMatch?.[1];
+        matches.slice(0, 10).forEach(item => {
+          const clean = item.replace(/<[^>]+>/g, "");
 
-        if (title && link) {
-          articles.push({
-            title: title.replace(/<!\[CDATA\[|\]\]>/g, ""),
-            link
-          });
-        }
-      });
+          if (clean.length > 20) {
+            articles.push({
+              title: clean,
+              link: source.url,
+              source: source.name
+            });
+          }
+        });
+
+      } catch (err) {
+        console.log("Error scraping:", source.name);
+      }
     }
 
-    // 🔥 إذا ماجاب حتى حاجة
+    // 🔥 fallback
     if (articles.length === 0) {
-      return new Response(
-        JSON.stringify({
-          trend: "Live 🔥",
-          news: [
-            {
-              title: "RSS connected but no items parsed",
-              link: "#"
-            }
-          ]
-        }),
-        { headers: { "Content-Type": "application/json" } }
-      );
+      articles.push({
+        title: "Scraper running but no data found",
+        link: "#"
+      });
     }
 
     return new Response(
       JSON.stringify({
         trend: "Live 🔥",
-        news: articles
+        news: articles.slice(0, 20)
       }),
       {
         headers: {
@@ -63,10 +69,7 @@ export async function GET() {
 
   } catch (err) {
     return new Response(
-      JSON.stringify({
-        error: "API crashed",
-        details: err.toString()
-      }),
+      JSON.stringify({ error: "Scraper crashed" }),
       { status: 500 }
     );
   }
